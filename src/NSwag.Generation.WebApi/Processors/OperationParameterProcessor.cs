@@ -218,10 +218,11 @@ namespace NSwag.Generation.WebApi.Processors
 
         private void EnsureSingleBodyParameter(OpenApiOperationDescription operationDescription)
         {
-            if (operationDescription.Operation.ActualParameters.Count(p => p.Kind == OpenApiParameterKind.Body) > 1)
-            {
-                throw new InvalidOperationException("The operation '" + operationDescription.Operation.OperationId + "' has more than one body parameter.");
-            }
+            // iiQ Custom
+            //if (operationDescription.Operation.ActualParameters.Count(p => p.Kind == OpenApiParameterKind.Body) > 1)
+            //{
+            //    throw new InvalidOperationException("The operation '" + operationDescription.Operation.OperationId + "' has more than one body parameter.");
+            //}
         }
 
         private void UpdateConsumedTypes(OpenApiOperationDescription operationDescription)
