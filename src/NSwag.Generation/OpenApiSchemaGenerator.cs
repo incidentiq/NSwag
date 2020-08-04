@@ -32,6 +32,12 @@ namespace NSwag.Generation
         /// <returns></returns>
         protected override void GenerateObject(JsonSchema schema, JsonTypeDescription typeDescription, JsonSchemaResolver schemaResolver)
         {
+            // iiQ Custom
+            // .. Guards against "Item" is registered multiple times exception within base.GenerateObject
+            if( typeDescription?.ContextualType?.Type?.FullName == "MongoDB.Bson.BsonValue" ||
+                ( typeDescription?.ContextualType?.Type?.FullName ?? "" ).StartsWith( "System." ) )
+                return;
+
             if (_isRootType)
             {
                 _isRootType = false;

@@ -102,14 +102,24 @@ namespace NSwag.AspNet.Owin.Middlewares
                 document.Schemes.Add(context.Request.Scheme == "http" ? OpenApiSchema.Http : OpenApiSchema.Https);
                 document.BasePath = context.Request.PathBase.Value?.Substring(0, context.Request.PathBase.Value.Length - (_settings.MiddlewareBasePath?.Length ?? 0)) ?? "";
             }
-            else
-            {
-                document.Servers.Clear();
-                document.Servers.Add(new OpenApiServer
-                {
-                    Url = context.Request.GetServerUrl()
-                });
-            }
+
+            // iiQ Custom
+            //else
+            //{
+            //    document.Servers.Clear();
+            //    document.Servers.Add(new OpenApiServer
+            //    {
+            //        Url = context.Request.GetServerUrl()
+            //    });
+            //}
+
+            // iiQ Custom
+            var updated = new Dictionary<string, OpenApiPathItem>();
+            foreach( var kv in document.Paths )
+                updated.Add( kv.Key.Replace( "/v1.0", "" ), kv.Value );
+            document.Paths.Clear();
+            foreach( var kv in updated )
+                document.Paths.Add( kv );
 
             _settings.PostProcess?.Invoke(document);
             var schemaJson = document.ToJson();

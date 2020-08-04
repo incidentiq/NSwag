@@ -81,6 +81,10 @@ namespace NSwag.Generation.WebApi
             var document = await CreateDocumentAsync().ConfigureAwait(false);
             var schemaResolver = new OpenApiSchemaResolver(document, Settings);
 
+            // iiQ Custom ( version )
+            document.Host = "yourdomain.incidentiq.com";
+            document.BasePath = "/api/v1.0";
+
             var usedControllerTypes = new List<Type>();
             foreach (var controllerType in controllerTypes)
             {
@@ -149,7 +153,13 @@ namespace NSwag.Generation.WebApi
                 .GetAssignableToTypeName("SwaggerIgnoreAttribute", TypeNameStyle.Name)
                 .Any();
 
-            if (hasIgnoreAttribute)
+            // iiQ Custom
+            var hasIncludeAttribute = controllerType.GetTypeInfo()
+                .GetCustomAttributes()
+                .GetAssignableToTypeName("OpenApiIncludeAttribute", TypeNameStyle.Name)
+                .Any();
+
+            if (! hasIncludeAttribute && hasIgnoreAttribute)
             {
                 return false;
             }
@@ -178,7 +188,10 @@ namespace NSwag.Generation.WebApi
                             {
                                 var operationDescription = new OpenApiOperationDescription
                                 {
-                                    Path = httpPath,
+                                    // iiQ Custom ( version )
+                                    Path = httpPath.Replace( "/v1.0", "" ),
+                                    // Path = httpPath,
+
                                     Method = httpMethod,
                                     Operation = new OpenApiOperation
                                     {
@@ -212,6 +225,11 @@ namespace NSwag.Generation.WebApi
                 if (addOperation)
                 {
                     var path = operation.Path.Replace("//", "/");
+
+                    // iiQ Custom
+                    // .. Prevents "The method 'get' on path '/v1.0' is registered multiple times" exception
+                    // .. Also guards for root pathed URLs such as "/v1.0" since all URLs are versioned in iiQ
+                    if( path.Split( new char[] { '/' } ).Length <= 2 ) continue;
 
                     if (!document.Paths.ContainsKey(path))
                     {
@@ -275,10 +293,15 @@ namespace NSwag.Generation.WebApi
                 m.IsSpecialName == false && // avoid property methods
                 m.DeclaringType == controllerType && // no inherited methods (handled in GenerateForControllerAsync)
                 m.DeclaringType != typeof(object) &&
-                m.IsStatic == false &&
-                m.GetCustomAttributes().Select(a => a.GetType()).All(a =>
-                    !a.IsAssignableToTypeName("SwaggerIgnoreAttribute", TypeNameStyle.Name) &&
-                    !a.IsAssignableToTypeName("NonActionAttribute", TypeNameStyle.Name)) &&
+                m.IsStatic == false && (
+                    // iiQ Custom
+                    // .. Attributes must either contain a "SwaggerIncludeAttribute" or not have a single "Ignore" attribute present
+                    ( m.GetCustomAttributes().Select(a => a.GetType()).Any(a =>
+                        a.IsAssignableToTypeName("SwaggerIncludeAttribute", TypeNameStyle.Name)) ) ||
+                    ( m.GetCustomAttributes().Select(b => b.GetType()).All(b =>
+                        !b.IsAssignableToTypeName("SwaggerIgnoreAttribute", TypeNameStyle.Name) &&
+                        !b.IsAssignableToTypeName("NonActionAttribute", TypeNameStyle.Name)) )
+                ) &&
                 m.DeclaringType.FullName.StartsWith("Microsoft.AspNet") == false && // .NET Core (Web API & MVC)
                 m.DeclaringType.FullName != "System.Web.Http.ApiController" &&
                 m.DeclaringType.FullName != "System.Web.Mvc.Controller")
