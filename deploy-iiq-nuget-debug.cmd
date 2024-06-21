@@ -1,17 +1,18 @@
 
-set /p ApiKey=Enter the API key required for publishing to nuget.iqapps.io: 
+:: set /p ApiKey=Enter the API key required for publishing to nuget.iqapps.io: 
 
 :: ---------------------------------------------------------
 :: Spark.NSwag.Core
 :: ---------------------------------------------------------
 
 cd src\NSwag.Core
-del bin\Debug\*.nupkg
+del bin\Release\*.nupkg
 
-dotnet build
+dotnet build -c Release
 dotnet pack
 
-dotnet nuget push bin\Debug\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg --source iiq-local-artifacts --api-key az --skip-duplicate --interactive
 
 cd ..\..
 
@@ -20,12 +21,13 @@ cd ..\..
 :: ---------------------------------------------------------
 
 cd src\NSwag.Annotations
-del bin\Debug\*.nupkg
+del bin\Release\*.nupkg
 
-dotnet build
+dotnet build -c Release
 dotnet pack
 
-dotnet nuget push bin\Debug\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg --source iiq-local-artifacts --api-key az --skip-duplicate --interactive
 
 cd ..\..
 
@@ -34,12 +36,13 @@ cd ..\..
 :: ---------------------------------------------------------
 
 cd src\NSwag.Generation
-del bin\Debug\*.nupkg
+del bin\Release\*.nupkg
 
-dotnet build
+dotnet build -c Release
 dotnet pack
 
-dotnet nuget push bin\Debug\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg --source iiq-local-artifacts --api-key az --skip-duplicate --interactive
 
 cd ..\..
 
@@ -48,12 +51,13 @@ cd ..\..
 :: ---------------------------------------------------------
 
 cd src\NSwag.Generation.WebApi
-del bin\Debug\*.nupkg
+del bin\Release\*.nupkg
 
-dotnet build
+dotnet build -c Release
 dotnet pack
 
-dotnet nuget push bin\Debug\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg --source iiq-local-artifacts --api-key az --skip-duplicate --interactive
 
 cd ..\..
 
@@ -62,12 +66,13 @@ cd ..\..
 :: ---------------------------------------------------------
 
 cd src\NSwag.AspNet.Owin
-del bin\Debug\*.nupkg
+del bin\Release\*.nupkg
 
-dotnet build
+dotnet build -c Release
 dotnet pack
 
-dotnet nuget push bin\Debug\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg -k %ApiKey% -s http://nuget.iqapps.io/api/v2/package
+dotnet nuget push bin\Release\*.nupkg --source iiq-local-artifacts --api-key az --skip-duplicate --interactive
 
 cd ..\..
 
